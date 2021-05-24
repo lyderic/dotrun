@@ -1,0 +1,30 @@
+alias z='tmux attach'
+alias l=ls
+alias ll="ls -lh"
+alias la="ls -la"
+alias c="clear"
+alias L=less
+alias sys='sudo systemctl'
+alias cs='sudo cryptsetup'
+alias bt='sudo btrfs'
+
+export LESS="FRIX"
+export EDITOR=vim
+export GIT_PAGER="less -erX"
+export TERM=xterm-256color
+
+export PATH=${PATH}:${HOME}/bin
+
+# ANSI colors
+export RED="\033[31m"
+export GRN="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export NOC="\033[0m"
+
+finish() {
+  history -c
+  > $HOME/.bash_history
+}
+
+trap finish EXIT
