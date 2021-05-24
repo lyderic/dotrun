@@ -1,0 +1,391 @@
+#!/bin/bash
+
+# ANSI colors
+export RED="\033[31m"
+export GRN="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export NOC="\033[0m"
+
+main() {
+	validate
+	configure
+	packages
+	unixuser
+	dotfiles
+}
+
+packages() {
+	header "packages"
+	pacman -Syyu --needed --noconfirm curl vim bash-completion \
+		git tree file htop neofetch tmux sudo
+}
+
+configure() {
+	header "configure"
+	if grep '#' /etc/locale.gen ; then
+		echo 'en_GB.UTF-8 UTF-8' > /etc/locale.gen
+		locale-gen
+	fi
+	if ! grep vim /etc/environment ; then
+		echo 'EDITOR=vim' >> /etc/environment
+		echo 'LC_ALL=en_GB.UTF-8' >> /etc/environment
+	fi
+	if [ ! -f /etc/locale.conf ] ; then
+		echo 'LANG=en_GB.UTF-8' > /etc/locale.conf
+	fi
+}
+
+unixuser() {
+	header "unix user"
+	if ! grep unix /etc/passwd ; then
+		useradd -m -s /bin/bash -G wheel unix
+		echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+	else
+		warn "user unix already set up"
+	fi
+}
+
+validate() {
+	[ -f /etc/arch-release ] || die "not arch linux"
+	[ ${UID} -eq 0 ] || die "gotta be root"
+}
+
+die() {
+	echo -e "${RED}${1}${NOC}"
+	exit 67
+}
+
+warn() {
+	echo -e "${YEL}${1}${NOC}"
+}
+
+header() {
+	echo -e "${BLU}[${1}]${NOC}"
+}
+
+################################################################################
+# DOTFILES                                                                     #
+################################################################################
+
+dotfiles() {
+	header "dot files"
+	echo "bigbang"
+	echo "${dotbigbang}" | tee /root/.bigbang /home/unix/.bigbang > /dev/null
+	echo "inputrc"
+	echo "${dotinputrc}" | tee /root/.inputrc /home/unix/.inputrc > /dev/null
+	echo "vimrc"
+	echo "${dotvimrc}"   | tee /root/.vimrc /home/unix/.vimrc > /dev/null
+	echo "tmux.conf"
+	echo "${dottmuxconf}" | tee /root/.tmux.conf /home/unix/.tmux.conf > /dev/null
+	for dotbashrc in /root/.bashrc /home/unix/.bashrc ; do
+		[ -f "${dotbashrc}" ] || touch "${dotbashrc}"
+		if ! grep bigbang "${dotbashrc}" ; then
+			echo '. ${HOME}/.bigbang' >> "${dotbashrc}"
+		fi
+	done
+	chown -v unix: /home/unix/\.[a-z]*
+}
+
+read -r -d '' dotbigbang << \
+--------------------------------------------------------------------------------
+alias z='tmux attach'
+alias l=ls
+alias ll="ls -lh"
+alias la="ls -la"
+alias c="clear"
+alias L=less
+alias sys='sudo systemctl'
+alias cs='sudo cryptsetup'
+alias bt='sudo btrfs'
+
+export LESS="FRIX"
+export EDITOR=vim
+export GIT_PAGER="less -erX"
+export TERM=xterm-256color
+
+export PATH="\${PATH}:\${HOME}/bin"
+
+# ANSI colors
+export RED="\033[31m"
+export GRN="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export NOC="\033[0m"
+
+finish() {
+  history -c
+  > \${HOME}/.bash_history
+}
+
+trap finish EXIT
+--------------------------------------------------------------------------------
+
+read -r -d '' dotinputrc << \
+--------------------------------------------------------------------------------
+set mark-symlinked-directories on
+set editing-mode vi
+set show-mode-in-prompt on
+set vi-ins-mode-string "I "
+set vi-cmd-mode-string "C "
+set keymap vi-insert
+"jj": "\e\e"
+--------------------------------------------------------------------------------
+
+read -r -d '' dotvimrc << \
+--------------------------------------------------------------------------------
+"Lyderic Landry's ViM configuration file
+
+"Required
+set nocompatible
+
+"My <leader> key (overwrites \)
+let mapleader = '-'
+
+"We always want UTF-8 whenever possible
+set encoding=utf-8
+
+"Alternatives to [ESC] in insert mode
+inoremap jj <esc>
+
+"[ESC] with simpler saving in insert mode
+inoremap jk <esc>:w<cr>
+
+"Simply hitting '=' in normal mode saves the buffer
+nnoremap = :w<cr>
+
+"Hit '+' in normal mode to save and quit
+nnoremap + :wq<cr>
+
+"Show italics and bolds nicely in markdown
+set conceallevel=3
+
+"Save and execute current buffer as script
+command! Run normal <esc>:w<cr> :!./%<cr>
+
+" In code mode, 'Q' simply shows the registers
+nnoremap Q :registers<cr>
+
+"Jump to the last position when reopening a file
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+"Display a statusline even if there is only one widow open
+set laststatus=2
+
+"Set up a default statusline
+set statusline=%f\ %h%w%m%r\ %=%(%l,%c%V\ %=\ %P%)
+
+"Wrap to the next line without breaking the words
+set wrap
+set linebreak
+
+"In case of joining lines, no double space after a dot
+set nojoinspaces
+"Display as much characters that can fit on the line, independently of the
+"frame width
+set textwidth=0
+
+"Autoindent when return to the next line (useful in programming)
+set autoindent
+
+"Helps indenting when writing code
+set smartindent
+
+"Autosave current buffer when it is changed to another buffer
+set autowrite
+
+"Show line numbers
+set number
+
+"Switch line numbering on/off
+nnoremap _ :set number!<cr>
+
+"Move easily from one window to another by hitting TAB
+nnoremap <tab> <c-w>w
+
+"Scrolling down one page by pressing of [Space]
+nnoremap <Space> <PageDown>
+
+"Scrolling up one page by pressing of [Backspace]
+map <BS> <PageUp>
+
+"Always show at least one line above/below the cursor
+set scrolloff=5
+
+"Default tab for 2
+set ts=2
+
+"We now indent with TABs as default as it makes Golang and Makefile happy
+"However, YAML doesn't allow tabs as indentation
+autocmd FileType yaml setlocal tabstop=2 softtabstop=2 shiftwidth=2 expandtab
+autocmd! BufWritePost *.yaml,*yml silent! retab | redraw!
+
+"Default backspace like normal
+set bs=2
+
+"Some option desactivated by default (remove the no).
+set nobackup
+set nohlsearch
+
+"Start searching before pressing enter
+set incsearch
+
+"Show the position of the cursor.
+set ruler
+
+"Show matching parenthese.
+set showmatch
+
+"Switch the bells (visual or acoustic) off
+set t_vb=
+set novisualbell
+set noerrorbells
+
+"Show all changes
+set report=0
+
+"Create new window below current one.
+set splitbelow
+
+"Show (partial) command keys in the status line
+set showcmd
+
+"Supress intro message
+set shortmess=I
+
+"Define set list options
+set nolist
+
+"Enhanced commandline completion
+set wildmenu
+
+"Syntax on by default
+syntax on
+
+"Ignore case in searches
+set ignorecase
+
+"Set width for autoincrement
+set shiftwidth=2
+
+"Don't show @s if the last line does not fit
+set display=lastline
+
+"Remap j and k to be usable on long lines
+nnoremap j gj
+nnoremap k gk
+
+"Command to change the directory to the directory of the current file
+command! CurrentDir normal :cd %:h<cr>:pwd<cr>
+
+"Deal with background
+set bg=dark
+command! Dark normal <esc>:set bg=dark<cr>
+command! Light normal <esc>:set bg=light<cr>
+
+"GOLANG STUFF
+autocmd! BufNewFile,BufRead *.go set autoread
+"run goimports
+nnoremap <leader>i :!goimports -w %<cr>
+"run goimports every time a go buffer is saved
+autocmd! BufWritePost *.go silent! execute "!goimports -w %" | redraw!
+"Some useful expands for go programming
+iabbr iferr if err != nil { panic(err) }
+iabbr errnn ; err != nil {  return}
+iabbr cmdo cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+iabbr cmdi cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+iabbr gtools . "github.com/lyderic/tools"
+
+"We want .tex files to be always or type latex!
+let g:tex_flavor='latex'
+
+"Use as strong encryption as possible
+set cryptmethod=blowfish2
+
+"Open terminal to the right (vim 8.1+ required!)
+command! VTerm :vertical rightbelow terminal
+
+"Word completion with [TAB], except when at begining of line
+"Doesn't work with accented characters :-(
+function! SmartTabCompletion()
+   let col = col('.') - 1
+   if !col || getline('.')[col - 1] !~ '\k'
+      return "\<tab>"
+   else
+      return "\<c-n>"
+   endif
+endfunction
+inoremap <tab> <c-r>=SmartTabCompletion()<cr>
+--------------------------------------------------------------------------------
+
+read -r -d '' dottmuxconf << \
+--------------------------------------------------------------------------------
+# We want C-a as prefix, like screen
+unbind-key C-b
+set-option -g prefix C-a
+#bind C-a send-prefix
+# Pressing Ctrl-a a will send Ctrl-a to the terminal
+# useful to get out of lxc console
+bind-key a send-prefix
+
+# Start numbering at 1
+# set -g base-index 1
+
+# Easier to remember to split
+unbind %
+bind | split-window -h
+bind - split-window -v 
+
+# Highlight active window
+#set-window-option -g window-status-current-bg red
+set-window-option -g window-status-current-style bg=red
+
+# Set status bar
+set -g status-left ' '
+
+# Like screen C-a-a
+bind-key C-a last-window
+
+# We don't want no delays when ESC is pressed (in vim or otherwise)
+set-option -sg escape-time 0
+
+# Start new session if none yet exists
+new-session
+
+# No renaming folks
+set-window-option -g automatic-rename off
+set-option -g allow-rename off
+
+# No names, not even the 'bash' default
+bind-key c new-window -n ''
+
+# Create a default window #1
+new-window -n ''
+
+# Window 0 is for root commands
+rename-window -t 0 'root'
+send-keys -t '0:0' 'sudo -i' enter
+
+# To allow italics
+set -g default-terminal "xterm-256color"
+
+# Bindings to move between panes
+bind -n 'M-Left'  select-pane -L
+bind -n 'M-Down'  select-pane -D
+bind -n 'M-Up'    select-pane -U
+bind -n 'M-Right' select-pane -R
+bind -n 'M-h'     select-pane -L
+bind -n 'M-j'     select-pane -D
+bind -n 'M-k'     select-pane -U
+bind -n 'M-l'     select-pane -R
+
+# Mouse support
+#set -g mouse on
+#set -g set-clipboard external
+
+# Vim-like movements in copy mode
+setw -g mode-keys vi
+bind -n M-PageUp copy-mode
+--------------------------------------------------------------------------------
+
+main ${@}
