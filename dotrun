@@ -67,7 +67,7 @@ dotfiles() {
 	for dotbashrc in /root/.bashrc /home/unix/.bashrc ; do
 		[ -f "${dotbashrc}" ] || touch "${dotbashrc}"
 		if ! grep bigbang "${dotbashrc}" ; then
-			echo 'source ${HOME}/.bigbang' >> "${dotbashrc}"
+			echo 'source $HOME/.bigbang' >> "${dotbashrc}"
 		fi
 	done
 	chown -v unix: /home/unix/\.[a-z]*
