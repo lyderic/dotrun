@@ -44,8 +44,8 @@ unixuser() {
 		warn "user unix already set up"
 	fi
 	if [ ! -f /etc/sudoers.d/wheelnopass ] ; then
-		echo '%wheel ALL=(ALL) NOPASSWD: ALL' \
-		| tee /etc/sudoers.d/wheelnopass
+		echo 'unix ALL=(ALL) NOPASSWD: ALL' \
+		| tee /etc/sudoers.d/unixnopass
 	fi
 }
 
