@@ -17,8 +17,9 @@ main() {
 
 packages() {
 	header "packages"
+	sudo sed -i -e 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 	pacman -Syyu --needed --noconfirm curl vim bash-completion \
-		git tree file htop neofetch tmux sudo net-tools
+		git tree file htop neofetch tmux sudo net-tools iotop
 }
 
 configure() {
@@ -34,7 +35,6 @@ configure() {
 	if [ ! -f /etc/locale.conf ] ; then
 		echo 'LANG=en_GB.UTF-8' > /etc/locale.conf
 	fi
-	sudo sed -i -e 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 }
 
 unixuser() {
