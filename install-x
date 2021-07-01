@@ -21,14 +21,15 @@ packages() {
 configure() {
 	header "configure"
 	[ -d ~unix/.vnc ] || mkdir -v ~unix/.vnc
-	echo ':0=unix' >> /etc/tigervnc/vncserver.users
+	grep --quiet ':0=unix' /etc/tigervnc/vncserver.users || \
+		echo ':0=unix' >> /etc/tigervnc/vncserver.users
 	echo 'session=openbox' > ~unix/.vnc/config
 	echo 'geometry=1920x1000' >> ~unix/.vnc/config
 	echo coucou | vncpasswd -f > ~unix/.vnc/passwd
 	chown -R unix: ~unix/.vnc
 	chmod 0600 ~unix/.vnc/passwd
-	systemctl enable vncserver@:0
-	systemctl start vncserver@:0
+	systemctl --quiet is-enabled vncserver@:0 || systemctl enable vncserver@:0
+	systemctl --quiet is-active vncserver@:0 || systemctl start vncserver@:0
 }
 
 validate() {
