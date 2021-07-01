@@ -15,7 +15,7 @@ main() {
 
 packages() {
 	header "packages"
-	pacman -Syyu --needed --noconfirm xorg-server noto-fonts openbox tigervnc xfce4-terminal firefox
+	pacman -Syyu --needed --noconfirm xorg-server noto-fonts xfce4 tigervnc xfce4-terminal firefox
 }
 
 configure() {
@@ -27,6 +27,8 @@ configure() {
 	echo coucou | vncpasswd -f > ~unix/.vnc/passwd
 	chown -R unix: ~unix/.vnc
 	chmod 0600 ~unix/.vnc/passwd
+	systemctl enable vncserver@:0
+	systemctl start vncserver@:0
 }
 
 validate() {
