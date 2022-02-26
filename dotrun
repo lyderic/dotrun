@@ -76,7 +76,7 @@ unixuser() {
 		return
 	fi
 	if which useradd ; then
-		useradd -m -s /bin/bash -G wheel unix
+		useradd -m -s /bin/bash unix
 	elif which adduser ; then
 		adduser -D -s /bin/bash unix
 	else
