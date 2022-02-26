@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ANSI colors
 export RED="\033[31m"
@@ -95,7 +95,7 @@ unixsudo() {
 
 validate() {
 	grep -q lyderic /etc/passwd && die "'lyderic' user detected"
-	[ ${UID} -eq 0 ] || die "gotta be root"
+	[ $(id -u) -eq 0 ] || die "gotta be root"
 }
 
 dotfiles() {
