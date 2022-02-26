@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # ANSI colors
 export RED="\033[31m"
@@ -7,22 +7,54 @@ export YEL="\033[33m"
 export BLU="\033[34m"
 export NOC="\033[0m"
 
+DISTRO="unknown"
+PACKAGES="bash curl vim bash-completion git tree file htop tmux sudo net-tools"
+
 main() {
+	DISTRO=$(grep -E '^ID=' /etc/*-release | sed -e 's/^.*ID=//')
+	echo "Distribution: ${DISTRO}"
 	validate
-	configure
-	packages
-	unixuser
-	dotfiles
+	case "${DISTRO}" in
+		"ubuntu"|"debian")
+			debian_packages
+			unixuser
+			dotfiles
+		;;
+		"arch")
+			arch_configure
+			arch_packages
+			unixuser
+			dotfiles
+		;;
+		"alpine")
+			alpine_packages
+			unixuser
+			dotfiles
+		;;
+		*) die "${DISTRO}: unknown distribution" ;;
+	esac
 }
 
-packages() {
-	header "packages"
+arch_packages() {
+	PACKAGES="${PACKAGES} pacman-contrib"
+	header "arch packages"
 	sed -i -e 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-	pacman -Syyu --needed --noconfirm curl vim bash-completion \
-		git tree file htop tmux sudo net-tools pacman-contrib
+	pacman -Syyu --needed --noconfirm ${PACKAGES}
 }
 
-configure() {
+debian_packages() {
+	header "debian packages"
+	apt update && apt -y upgrade
+	apt -y install ${PACKAGES}
+}
+
+alpine_packages() {
+	header "alpine packages"
+	apk update && apk upgrade
+	apk add ${PACKAGES}
+}
+
+arch_configure() {
 	header "configure"
 	if grep '#' /etc/locale.gen ; then
 		echo 'en_GB.UTF-8 UTF-8' > /etc/locale.gen
@@ -39,19 +71,30 @@ configure() {
 
 unixuser() {
 	header "unix user"
-	if ! id unix ; then
-		useradd -m -s /bin/bash -G wheel unix
-	else
+	if id unix ; then
 		warn "user unix already set up"
+		return
 	fi
-	if [ ! -f /etc/sudoers.d/wheelnopass ] ; then
+	if which useradd ; then
+		useradd -m -s /bin/bash -G wheel unix
+	elif which adduser ; then
+		adduser -D -s /bin/bash unix
+	else
+		die "No useradd nor adduser command found!"
+	fi
+	unixsudo
+}
+
+unixsudo() {
+	id unix || die "no 'unix' user found!"
+	if [ ! -f /etc/sudoers.d/unixnopass ] ; then
 		echo 'unix ALL=(ALL) NOPASSWD: ALL' \
 		| tee /etc/sudoers.d/unixnopass
 	fi
 }
 
 validate() {
-	[ -f /etc/arch-release ] || die "not arch linux"
+	grep -q lyderic /etc/passwd && die "'lyderic' user detected"
 	[ ${UID} -eq 0 ] || die "gotta be root"
 }
 

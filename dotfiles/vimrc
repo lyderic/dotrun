@@ -119,6 +119,8 @@ set shortmess=I
 
 "Define set list options
 set nolist
+set listchars=lead:·,trail:·,tab:--»,eol:$
+nnoremap <leader>l :set list!<cr>
 
 "Enhanced commandline completion
 set wildmenu

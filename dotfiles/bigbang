@@ -5,6 +5,7 @@ alias la="ls -la"
 alias cls="clear"
 alias L=less
 alias sys='sudo systemctl'
+alias croc='croc --relay europe.cybermoped.com'
 alias cs='sudo cryptsetup'
 alias bt='sudo btrfs'
 
