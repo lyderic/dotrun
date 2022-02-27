@@ -26,7 +26,7 @@ configure() {
 	grep --quiet ":0=${USER}" /etc/tigervnc/vncserver.users || \
 		echo ":0=${USER}" | sudo tee -a /etc/tigervnc/vncserver.users
 	cd ${HOME}/.vnc
-	[ -f config ] || echo -e "session=openbox\ngeometry=1920x1000" | tee config
+	[ -f config ] || echo -e "session=openbox\ngeometry=1920x1000\nlocalhost" | tee config
 	[ -f passwd ] || vncpasswd
 	sudo systemctl --quiet is-enabled vncserver@:0 || sudo systemctl enable vncserver@:0
 	sudo systemctl --quiet is-active vncserver@:0 || sudo systemctl start vncserver@:0
