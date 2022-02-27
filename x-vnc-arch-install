@@ -25,8 +25,8 @@ packages() {
 configure() {
 	header "configure"
 	[ -d ${HOME}/.vnc ] || mkdir -v ${HOME}/.vnc
-	grep --quiet ':0=lyderic' /etc/tigervnc/vncserver.users || \
-		echo ':0=lyderic' | sudo tee -a /etc/tigervnc/vncserver.users
+	grep --quiet ":0=${USER}" /etc/tigervnc/vncserver.users || \
+		echo ":0=${USER}" | sudo tee -a /etc/tigervnc/vncserver.users
 	echo 'session=openbox' > ${HOME}/.vnc/config
 	echo 'geometry=1920x1000' >> ${HOME}/.vnc/config
 	echo "${vnc_password}" | vncpasswd -f > ${HOME}/.vnc/passwd
