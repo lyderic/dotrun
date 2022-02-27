@@ -31,8 +31,8 @@ configure() {
 	echo 'geometry=1920x1000' >> ${HOME}/.vnc/config
 	echo "${vnc_password}" | vncpasswd -f > ${HOME}/.vnc/passwd
 	chmod 0600 ${HOME}/.vnc/passwd
-	systemctl --quiet is-enabled vncserver@:0 || systemctl enable vncserver@:0
-	systemctl --quiet is-active vncserver@:0 || systemctl start vncserver@:0
+	sudo systemctl --quiet is-enabled vncserver@:0 || sudo systemctl enable vncserver@:0
+	sudo systemctl --quiet is-active vncserver@:0 || sudo systemctl start vncserver@:0
 }
 
 validate() {
