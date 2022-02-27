@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# ANSI colors
+export RED="\033[31m"
+export GRN="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export NOC="\033[0m"
+
+VNC_PASSWORD=
+
+main() {
+	validate
+	packages
+	configure
+}
+
+packages() {
+	header "packages"
+	sudo pacman -Syyu --needed --noconfirm \
+		xorg-server noto-fonts xfce4 tigervnc xfce4-terminal firefox \
+	|| die "packages could not be installed"
+}
+
+configure() {
+	header "configure"
+	[ -d ${HOME}/.vnc ] || mkdir -v ${HOME}/.vnc
+	grep --quiet ':0=lyderic' /etc/tigervnc/vncserver.users || \
+		echo ':0=lyderic' >> /etc/tigervnc/vncserver.users
+	echo 'session=openbox' > ${HOME}/.vnc/config
+	echo 'geometry=1920x1000' >> ${HOME}/.vnc/config
+	echo "${vnc_password}" | vncpasswd -f > ${HOME}/.vnc/passwd
+	chown -R lyderic: ${HOME}/.vnc
+	chmod 0600 ${HOME}/.vnc/passwd
+	systemctl --quiet is-enabled vncserver@:0 || systemctl enable vncserver@:0
+	systemctl --quiet is-active vncserver@:0 || systemctl start vncserver@:0
+}
+
+validate() {
+	[ $(id -u) -eq 0 ] && die "cannot be executed as root"
+	read -sp "vnc password? " VNC_PASSWORD
+	echo
+	echo "Pass: ${VNC_PASSWORD}"
+	[ -z ${VNC_PASSWORD} ] && die "empty password not allowed"
+	[ -f /etc/arch-release ] || die "not arch linux"
+}
+
+die() {
+	echo -e "${RED}${1}${NOC}"
+	exit 67
+}
+
+warn() {
+	echo -e "${YEL}${1}${NOC}"
+}
+
+header() {
+	echo -e "${BLU}[${1}]${NOC}"
+}
+
+main ${@}
