@@ -7,8 +7,6 @@ export YEL="\033[33m"
 export BLU="\033[34m"
 export NOC="\033[0m"
 
-VNC_PASSWORD=
-
 main() {
 	validate
 	packages
@@ -27,20 +25,16 @@ configure() {
 	[ -d ${HOME}/.vnc ] || mkdir -v ${HOME}/.vnc
 	grep --quiet ":0=${USER}" /etc/tigervnc/vncserver.users || \
 		echo ":0=${USER}" | sudo tee -a /etc/tigervnc/vncserver.users
-	echo 'session=openbox' > ${HOME}/.vnc/config
-	echo 'geometry=1920x1000' >> ${HOME}/.vnc/config
-	echo "${vnc_password}" | vncpasswd -f > ${HOME}/.vnc/passwd
-	chmod 0600 ${HOME}/.vnc/passwd
+	cd ${HOME}/.vnc
+	[ -f config ] || echo -e "session=openbox\ngeometry=1920x1000" | tee config
+	[ -f passwd ] || vncpasswd
 	sudo systemctl --quiet is-enabled vncserver@:0 || sudo systemctl enable vncserver@:0
 	sudo systemctl --quiet is-active vncserver@:0 || sudo systemctl start vncserver@:0
 }
 
 validate() {
+	[ -d ${HOME}/.vnc ] && die ".vnc directory found in ${HOME}"
 	[ $(id -u) -eq 0 ] && die "cannot be executed as root"
-	read -sp "vnc password? " VNC_PASSWORD
-	echo
-	echo "Pass: ${VNC_PASSWORD}"
-	[ -z ${VNC_PASSWORD} ] && die "empty password not allowed"
 	[ -f /etc/arch-release ] || die "not arch linux"
 }
 
