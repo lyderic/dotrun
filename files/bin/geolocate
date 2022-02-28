@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl -sf "http://ip-api.com/line/?fields=query,city,country,isp"

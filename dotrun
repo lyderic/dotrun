@@ -18,18 +18,18 @@ main() {
 		"ubuntu"|"debian")
 			debian_packages
 			unixuser
-			dotfiles
+			copyfiles
 		;;
 		"arch")
 			arch_configure
 			arch_packages
 			unixuser
-			dotfiles
+			copyfiles
 		;;
 		"alpine")
 			alpine_packages
 			unixuser
-			dotfiles
+			copyfiles
 		;;
 		*) die "${DISTRO}: unknown distribution" ;;
 	esac
@@ -98,14 +98,14 @@ validate() {
 	[ $(id -u) -eq 0 ] || die "gotta be root"
 }
 
-dotfiles() {
-	header "dot files"
+copyfiles() {
 	git clone https://github.com/lyderic/dotrun /dev/shm/dotrun
-	for path in /dev/shm/dotrun/dotfiles/* ; do
+	header "dot files"
+	for path in /dev/shm/dotrun/files/dot/* ; do
 		dotname=".$(basename ${path})"
 		warn "${path} [${dotname}]"
 		for destdir in /root /home/unix ; do
-			cp -v "${path}" "${destdir}/${dotname}"
+			cp -uv "${path}" "${destdir}/${dotname}"
 		done
 	done
 	for dotbashrc in /root/.bashrc /home/unix/.bashrc ; do
@@ -115,6 +115,13 @@ dotfiles() {
 		fi
 	done
 	chown -v unix: /home/unix/\.[a-z]*
+	header "bin files"
+	for bindir in /home/unix/bin /root/bin ; do
+		[ -d ${bindir} ] || mkdir -v ${bindir}
+		cp -uv /dev/shm/dotrun/files/bin/* ${bindir}
+		chmod +xv ${bindir}/*
+	done
+	chown -Rv unix: /home/unix/bin
 	rm -rf /dev/shm/dotrun
 }
 

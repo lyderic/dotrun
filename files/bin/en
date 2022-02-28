@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# this replaces the C 'editname' command
+
+main() {
+	if [ -z "${1}" ] ; then
+		usage
+	fi
+	oldname="${@}"
+	read -p "> " -ei "${oldname}" newname
+	mv -v "${oldname}" "${newname}"
+}
+
+usage() {
+	echo "Usage: en <file>"
+	exit
+}
+
+main $@

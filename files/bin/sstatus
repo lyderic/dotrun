@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# ANSI colors
+RED="\033[31m"
+GRN="\033[32m"
+YEL="\033[33m"
+BLU="\033[34m"
+NOC="\033[0m"
+
+function computesep() {
+	echo -ne "${BLU}"
+	for i in $(seq $(tput cols))
+	do
+		echo -n '-'
+	done
+	echo -e "${NOC}"
+}
+separator=$(computesep)
+
+main() {
+	clear
+	echo
+	neofetch
+	echo ${separator}
+	uptime
+	echo ${separator}
+	free -h
+	echo ${separator}
+	df --human-readable \
+		 --exclude-type=devtmpfs \
+		 --exclude-type=tmpfs \
+		 --exclude-type=squashfs \
+		 --exclude-type=fuse.gocryptfs \
+		 --local \
+		 --print-type
+	echo ${separator}
+	ip -brief -color addr
+	echo ${separator}
+}
+
+main $@
