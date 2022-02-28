@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# ANSI colors
+export RED="\033[31m"
+export GRN="\033[32m"
+export YEL="\033[33m"
+export BLU="\033[34m"
+export NOC="\033[0m"
+
+main() {
+	validate
+	packages
+	configure
+}
+
+packages() {
+	header "packages"
+	sudo apt update && sudo apt install xfce4 tightvncserver \
+	|| die "packages could not be installed"
+}
+
+configure() {
+	header "configure"
+	[ -d ${HOME}/.vnc ] || mkdir -v ${HOME}/.vnc
+	cd ${HOME}/.vnc
+	[ -f xstartup ] || echo -e "#!/bin/bash\nxrdb $HOME/.Xresources\nstartxfce4 &" | tee xstartup
+	[ -f passwd ] || vncpasswd
+}
+
+validate() {
+	[ -d ${HOME}/.vnc ] && die ".vnc directory found in ${HOME}"
+	[ $(id -u) -eq 0 ] && die "cannot be executed as root"
+	grep "ID=ubuntu" /etc/os-release || die "not arch linux"
+}
+
+die() {
+	echo -e "${RED}${1}${NOC}"
+	exit 67
+}
+
+warn() {
+	echo -e "${YEL}${1}${NOC}"
+}
+
+header() {
+	echo -e "${BLU}[${1}]${NOC}"
+}
+
+main ${@}
