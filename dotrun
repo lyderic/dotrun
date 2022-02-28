@@ -8,7 +8,7 @@ export BLU="\033[34m"
 export NOC="\033[0m"
 
 DISTRO="unknown"
-PACKAGES="bash curl vim bash-completion git tree file htop tmux sudo net-tools"
+PACKAGES="bash curl vim bash-completion git tree file htop tmux sudo net-tools neofetch"
 
 main() {
 	DISTRO=$(grep -E '^ID=' /etc/*-release | sed -e 's/^.*ID=//')
@@ -119,9 +119,9 @@ copyfiles() {
 	for bindir in /home/unix/bin /root/bin ; do
 		[ -d ${bindir} ] || mkdir -v ${bindir}
 		cp -uv /dev/shm/dotrun/files/bin/* ${bindir}
-		chmod +xv ${bindir}/*
+		chmod -v +x ${bindir}/*
 	done
-	chown -Rv unix: /home/unix/bin
+	chown -v -R unix: /home/unix/bin
 	rm -rf /dev/shm/dotrun
 }
 
