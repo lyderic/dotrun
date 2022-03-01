@@ -13,6 +13,7 @@ PACKAGES="bash curl vim bash-completion git tree file htop tmux sudo net-tools n
 main() {
 	DISTRO=$(grep -E '^ID=' /etc/*-release | sed -e 's/^.*ID=//')
 	echo "Distribution: ${DISTRO}"
+	[ -f /etc/distro ] || echo ${DISTRO} | sudo tee /etc/distro
 	validate
 	case "${DISTRO}" in
 		"ubuntu"|"debian")
@@ -36,7 +37,7 @@ main() {
 }
 
 arch_packages() {
-	PACKAGES="${PACKAGES} pacman-contrib"
+	PACKAGES="${PACKAGES} pacman-contrib croc"
 	header "arch packages"
 	sed -i -e 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
 	pacman -Syyu --needed --noconfirm ${PACKAGES}
@@ -49,6 +50,7 @@ debian_packages() {
 }
 
 alpine_packages() {
+	PACKAGES="${PACKAGES} croc"
 	header "alpine packages"
 	apk update && apk upgrade
 	apk add ${PACKAGES}
