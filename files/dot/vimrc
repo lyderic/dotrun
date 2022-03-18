@@ -30,6 +30,9 @@ nnoremap Q :registers<cr>
 "Jump to the last position when reopening a file
 autocmd! BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
+"Set path conveniently when working on coding or litterary projects
+autocmd! VimEnter *.lkl,*.go :set path=**
+
 "Display a statusline even if there is only one widow open
 set laststatus=2
 
@@ -137,17 +140,25 @@ set shiftwidth=2
 "Don't show @s if the last line does not fit
 set display=lastline
 
+"To avoid accidently opening this command line I have no use of
+nnoremap q: :q
+
 "Remap j and k to be usable on long lines
 nnoremap j gj
 nnoremap k gk
 
+"Quit and save all (same as 'ZZ' but for all buffers)
+nnoremap ZA :wqa<CR>
+
+"Quit all without saving (same as 'ZQ' but for all buffers)
+nnoremap ZAQ :qa!<CR>
+
 "Command to change the directory to the directory of the current file
 command! CurrentDir normal :cd %:h<cr>:pwd<cr>
 
-"Abbreviations to help find a file in the path or the buffers list
-cabbr ff find
-cabbr ee buffers<CR>:buffer
-cabbr vsf vertical sfind
+"Command aliases
+cnoreabbrev f <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "find" : "f"<CR>
+cnoreabbrev ff <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "vertical sfind" : "ff"<CR>
 
 "Deal with background
 set background=dark
@@ -168,14 +179,13 @@ command! VTerm :vertical rightbelow terminal
 "----------------------------------------------
 
 "Word completion with [TAB], except when at begining of line
-"Doesn't work with accented characters :-( -- NOT
 function! SmartTabCompletion()
 	let pos = col('.') - 1
 	"if pos == 0 || getline('.')[pos - 1] !~ '\k'
 	if pos == 0 || getline('.')[pos - 1] =~ '\s'
 		return "\<tab>"
 	else
-		return "\<c-p>"
+		return "\<c-n>"
 	endif
 endfunction
 inoremap <tab> <c-r>=SmartTabCompletion()<cr>
