@@ -121,7 +121,7 @@ set shortmess=I
 "Define set list options
 set nolist
 "For 'lead' listchar, vim 8.2+ required!
-set listchars=lead:·,trail:·,tab:--»,eol:$
+set listchars=lead:·,trail:·,tab:--»,nbsp:␣,eol:$
 nnoremap <leader>l :set list!<cr>
 
 "Enhanced commandline completion
