@@ -148,17 +148,21 @@ nnoremap j gj
 nnoremap k gk
 
 "Quit and save all (same as 'ZZ' but for all buffers)
-nnoremap ZA :wqa<CR>
+nnoremap ZA :wqa<cr>
 
 "Quit all without saving (same as 'ZQ' but for all buffers)
-nnoremap ZAQ :qa!<CR>
+nnoremap ZAQ :qa!<cr>
 
 "Command to change the directory to the directory of the current file
 command! CurrentDir normal :cd %:h<cr>:pwd<cr>
 
 "Command aliases
-cnoreabbrev f <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "find" : "f"<CR>
-cnoreabbrev ff <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "vertical sfind" : "ff"<CR>
+cnoreabbrev f <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "find" : "f"<cr>
+cnoreabbrev ff <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "vertical sfind" : "ff"<cr>
+
+"UTF-8 non breaking space
+inoremap j<Space>  
+inoremap ¬  
 
 "Deal with background
 set background=dark
