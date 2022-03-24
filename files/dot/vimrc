@@ -45,6 +45,7 @@ set linebreak
 
 "In case of joining lines, no double space after a dot
 set nojoinspaces
+
 "Display as much characters that can fit on the line, independently of the
 "frame width
 set textwidth=0
@@ -56,7 +57,7 @@ set autoindent
 set smartindent
 
 "Autosave current buffer when it is changed to another buffer
-set autowrite
+set autowriteall
 
 "Show line numbers
 set number
@@ -161,7 +162,6 @@ cnoreabbrev f <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "find" : "f"<cr>
 cnoreabbrev ff <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "vertical sfind" : "ff"<cr>
 
 "UTF-8 non breaking space
-inoremap j<Space>  
 inoremap ¬  
 
 "Deal with background
@@ -206,3 +206,20 @@ function! SaveSessionIfFound()
 	endif
 endfunction
 autocmd! VimLeave *.lkl,*.go :call SaveSessionIfFound()
+
+function! RelativenumberOn()
+	setlocal relativenumber
+	nnoremap <buffer> j j
+	nnoremap <buffer> k k
+	echo "relativenumber enabled"
+endfunction
+
+function! RelativenumberOff()
+	setlocal norelativenumber
+	nnoremap <buffer> j gj
+	nnoremap <buffer> k gk
+	echo "relativenumber disabled"
+endfunction
+
+nnoremap <leader>k :call RelativenumberOn()<cr>
+nnoremap <leader>K :call RelativenumberOff()<cr>
