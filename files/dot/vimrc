@@ -18,9 +18,6 @@ inoremap jk <esc>:w<cr>
 "Simply hitting '=' in normal mode saves the buffer
 nnoremap = :w<cr>
 
-"Hit '+' in normal mode to save and quit
-nnoremap + :wq<cr>
-
 "Show italics and bolds nicely in markdown
 set conceallevel=3
 
@@ -63,7 +60,7 @@ set autowriteall
 set number
 
 "Switch line numbering on/off
-nnoremap _ :set number!<cr>
+nnoremap <leader>K :set number!<cr>
 
 "Move easily from one window to another by hitting TAB
 nnoremap <tab> <c-w>w
@@ -207,19 +204,30 @@ function! SaveSessionIfFound()
 endfunction
 autocmd! VimLeave *.lkl,*.go :call SaveSessionIfFound()
 
-function! RelativenumberOn()
-	setlocal relativenumber
-	nnoremap <buffer> j j
-	nnoremap <buffer> k k
-	echo "relativenumber enabled"
-endfunction
+"function! RelativenumberOn()
+"	setlocal relativenumber
+"	nnoremap <buffer> j j
+"	nnoremap <buffer> k k
+"	echo "relativenumber enabled"
+"endfunction
+"
+"function! RelativenumberOff()
+"	setlocal norelativenumber
+"	nnoremap <buffer> j gj
+"	nnoremap <buffer> k gk
+"	echo "relativenumber disabled"
+"endfunction
 
-function! RelativenumberOff()
-	setlocal norelativenumber
-	nnoremap <buffer> j gj
-	nnoremap <buffer> k gk
-	echo "relativenumber disabled"
+function! ToggleRelativenumber()
+	setlocal relativenumber!
+	if &relativenumber == 0
+		nnoremap <buffer> j gj
+		nnoremap <buffer> k gk
+		echo "relativenumber disabled"
+	else
+		nnoremap <buffer> j j
+		nnoremap <buffer> k k
+		echo "relativenumber enabled"
+	endif
 endfunction
-
-nnoremap <leader>k :call RelativenumberOn()<cr>
-nnoremap <leader>K :call RelativenumberOff()<cr>
+nnoremap <leader>k :call ToggleRelativenumber()<cr>
