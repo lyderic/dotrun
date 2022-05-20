@@ -18,6 +18,9 @@ inoremap jk <esc>:w<cr>
 "Simply hitting '=' in normal mode saves the buffer
 nnoremap = :w<cr>
 
+"Show buffers to select
+nnoremap <Leader>p :buffer <C-d>
+
 "Show italics and bolds nicely in markdown
 set conceallevel=3
 
