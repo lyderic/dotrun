@@ -40,7 +40,10 @@ autocmd! VimEnter *.lkl,*.go :set path=**
 set laststatus=2
 
 "Set up a default statusline
-set statusline=%f\ %h%w%m%r\ %=%(%l,%v\ %=\ %P%)
+function! GetKeymapName()
+	return get(b:,"keymap_name","")
+endfunction
+set statusline=%f\ %h%w%m%r\ %=%{GetKeymapName()}\ %(%l,%v\ %=\ %P%)
 
 "Wrap to the next line without breaking the words
 set wrap
@@ -167,6 +170,21 @@ cnoreabbrev ff <c-r>=getcmdpos() == 1 && getcmdtype() == ":" ? "vertical sfind" 
 "UTF-8 non breaking space
 inoremap ¬  
 
+"Toggle accents keymap (found in ~/.vim/keymap/lkaccents.vim)
+function! ToggleAccents()
+    if &keymap == "lkaccents"
+				echo "Accents Off"
+        set keymap=
+    else
+				echo "Accents On"
+        set keymap=lkaccents
+    endif
+endfunction
+nnoremap <leader>a :call ToggleAccents()<cr>
+nnoremap <c-j> :call ToggleAccents()<cr>
+inoremap <c-j> <esc>:call ToggleAccents()<cr>a
+"inoremap <c-q> <esc>:call ToggleAccents()<cr>a
+
 "Deal with background
 set background=dark
 command! Dark set background=dark
@@ -237,3 +255,11 @@ function! ToggleRelativenumber()
 	endif
 endfunction
 nnoremap <leader>k :call ToggleRelativenumber()<cr>
+
+"function! GetKeymapName()
+"	if exists("b:keymap_name")
+"		return b:keymap_name
+"	else
+"		return ""
+"	endif
+"endfunction
