@@ -40,10 +40,11 @@ autocmd! VimEnter *.lkl,*.go :set path=**
 set laststatus=2
 
 "Set up a default statusline
-function! GetKeymapName()
-	return get(b:,"keymap_name","")
-endfunction
-set statusline=%f\ %h%w%m%r\ %=%{GetKeymapName()}\ %(%l,%v\ %=\ %P%)
+"function! GetKeymapName()
+	"return get(b:,"keymap_name","")
+"endfunction
+"set statusline=%f\ %h%w%m%r\ %=%{GetKeymapName()}\ %(%l,%v\ %=\ %P%)
+set statusline=%f\ %h%w%m%r\ %=%k\ %(%l,%v\ %=\ %P%)
 
 "Wrap to the next line without breaking the words
 set wrap
@@ -255,11 +256,3 @@ function! ToggleRelativenumber()
 	endif
 endfunction
 nnoremap <leader>k :call ToggleRelativenumber()<cr>
-
-"function! GetKeymapName()
-"	if exists("b:keymap_name")
-"		return b:keymap_name
-"	else
-"		return ""
-"	endif
-"endfunction
