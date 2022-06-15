@@ -66,7 +66,7 @@ arch_configure() {
 		echo 'EDITOR=vim' >> /etc/environment
 		echo 'LC_ALL=en_GB.UTF-8' >> /etc/environment
 	fi
-	if [ ! -f /etc/locale.conf ] ; then
+	if ! grep UTF-8 /etc/locale.conf ; then
 		echo 'LANG=en_GB.UTF-8' > /etc/locale.conf
 	fi
 }
