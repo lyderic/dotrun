@@ -173,18 +173,21 @@ inoremap ¬  
 
 "Toggle accents keymap (found in ~/.vim/keymap/lkaccents.vim)
 function! ToggleAccents()
-    if &keymap == "lkaccents"
-				echo "Accents Off"
-        set keymap=
-    else
-				echo "Accents On"
-        set keymap=lkaccents
-    endif
+	if ! filereadable(expand('~/.vim/keymap/lkaccents.vim'))
+		echo "Accents not installed"
+		return
+	endif
+	if &keymap == "lkaccents"
+			echo "Accents Off"
+			set keymap=
+	else
+			echo "Accents On"
+			set keymap=lkaccents
+	endif
 endfunction
 nnoremap <leader>a :call ToggleAccents()<cr>
 nnoremap <c-j> :call ToggleAccents()<cr>
 inoremap <c-j> <esc>:call ToggleAccents()<cr>a
-"inoremap <c-q> <esc>:call ToggleAccents()<cr>a
 
 "Deal with background
 set background=dark
