@@ -41,8 +41,9 @@ set laststatus=2
 
 "Set up a default statusline
 if &statusline == ""
-	set statusline=%f\ %h%m%w%r%= "left
-	set statusline+=%k\ %l,%v\ %P "right
+	set statusline+=%f\ %h%m%w%r  "left (f=file,h=help,m=modified,w=preview,r=ro)
+	set statusline+=%=            "separator l/r
+	set statusline+=%k\ %l,%v\ %P "right (k=keymap,l=line,v=col,P=progress)
 endif
 
 "Wrap to the next line without breaking the words
@@ -246,14 +247,24 @@ endfunction
 nnoremap <leader>k :call ToggleRelativenumber()<cr>
 
 function! DisplayInformation()
-	echon expand('%:p') . " ["
-	if &filetype != ""
-		echon &filetype " "
-	endif
-	echon &encoding " "
-	echon &fileformat
-	echon "]"
-	echo
+	let l:u = "unset"
+	echo "File: " . expand('%:p')
+		\ "--"
+		\ printf("[%s]", (&filetype == ""   ? l:u : &filetype))
+		\ printf("[%s]", (&encoding == ""   ? l:u : &encoding))
+		\ printf("[%s]", (&fileformat == "" ? l:u : &fileformat))
+	let l:chars = ThousandsSeparator(wordcount().chars)
+	let l:words = ThousandsSeparator(wordcount().words)
+	let l:bytes = ThousandsSeparator(wordcount().bytes)
+	let l:fmt = "%4s: %" . strlen(l:bytes) . "s"
+	echo printf(l:fmt, "Chars", l:chars)
+	echo printf(l:fmt, "Words", l:words)
+	echo printf(l:fmt, "Bytes", l:bytes)
 endfunction
 command! DisplayInformation :call DisplayInformation()
 nnoremap <leader>g :call DisplayInformation()<cr>
+
+"Thanks to: https://stackoverflow.com/questions/10461055/how-to-insert-thousand-separators-only-before-the-decimal-separator
+function! ThousandsSeparator(input)
+	return substitute(a:input, '\(\d,\d*\)\@<!\d\ze\(\d\{3}\)\+\d\@!', '&,', 'g')	
+endfunction
