@@ -22,7 +22,7 @@ nnoremap = :w<cr>
 nnoremap <Leader>p :buffer <C-d>
 
 "Better wildmode for selecting buffer
-set wildmode=list,full
+"set wildmode=list,full
 
 "Show italics and bolds nicely in markdown
 set conceallevel=3
@@ -40,8 +40,10 @@ autocmd! VimEnter *.lkl,*.go :set path=**
 set laststatus=2
 
 "Set up a default statusline
-set statusline=%f\ %m%w%r%= "left
-set statusline+=%k\ %l,%v\ %P "right
+if &statusline == ""
+	set statusline=%f\ %h%m%w%r%= "left
+	set statusline+=%k\ %l,%v\ %P "right
+endif
 
 "Wrap to the next line without breaking the words
 set wrap
@@ -229,20 +231,6 @@ function! SaveSessionIfFound()
 endfunction
 autocmd! VimLeave *.lkl,*.go :call SaveSessionIfFound()
 
-"function! RelativenumberOn()
-"	setlocal relativenumber
-"	nnoremap <buffer> j j
-"	nnoremap <buffer> k k
-"	echo "relativenumber enabled"
-"endfunction
-"
-"function! RelativenumberOff()
-"	setlocal norelativenumber
-"	nnoremap <buffer> j gj
-"	nnoremap <buffer> k gk
-"	echo "relativenumber disabled"
-"endfunction
-
 function! ToggleRelativenumber()
 	setlocal relativenumber!
 	if &relativenumber == 0
@@ -258,10 +246,14 @@ endfunction
 nnoremap <leader>k :call ToggleRelativenumber()<cr>
 
 function! DisplayInformation()
-	echo "Information:"
-	echo "Full path:"
-	echo "Type:"
-	echo "Encoding:"
-	echo "Format:"
+	echon expand('%:p') . " ["
+	if &filetype != ""
+		echon &filetype " "
+	endif
+	echon &encoding " "
+	echon &fileformat
+	echon "]"
+	echo
 endfunction
+command! DisplayInformation :call DisplayInformation()
 nnoremap <leader>g :call DisplayInformation()<cr>
