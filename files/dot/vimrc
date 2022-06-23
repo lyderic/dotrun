@@ -24,8 +24,10 @@ nnoremap <Leader>p :buffer <C-d>
 "Better wildmode for selecting buffer
 "set wildmode=list,full
 
-"Show italics and bolds nicely in markdown
+"Show italics and bolds nicely when editing markdown
+"in normal and command modes
 set conceallevel=3
+set concealcursor=nc
 
 " In code mode, 'Q' simply shows the registers
 nnoremap Q :registers<cr>
