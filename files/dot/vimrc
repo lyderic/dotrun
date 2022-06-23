@@ -20,6 +20,7 @@ nnoremap = :w<cr>
 
 "Show buffers to select
 nnoremap <Leader>p :buffer <C-d>
+"nnoremap <Leader>p :ls<cr>:buffer 
 
 "Better wildmode for selecting buffer
 "set wildmode=list,full
