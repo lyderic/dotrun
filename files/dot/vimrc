@@ -138,6 +138,9 @@ nnoremap <leader>l :set list!<cr>
 "Enhanced commandline completion
 set wildmenu
 
+"Completion in a pop-up menu (new in vim 9)
+set wildoptions=pum
+
 "Syntax on by default
 syntax on
 
