@@ -15,20 +15,16 @@ main() {
 
 packages() {
 	header "packages"
-	sudo apt update && sudo apt install xfce4 tightvncserver \
+	sudo apt update && sudo apt install xfce4 xrdp \
 	|| die "packages could not be installed"
 }
 
 configure() {
 	header "configure"
-	[ -d ${HOME}/.vnc ] || mkdir -v ${HOME}/.vnc
-	cd ${HOME}/.vnc
-	[ -f xstartup ] || echo -e "#!/bin/bash\nxrdb $HOME/.Xresources\nstartxfce4 &" | tee xstartup
-	[ -f passwd ] || vncpasswd
+	warn "nothing to do :-)"
 }
 
 validate() {
-	[ -d ${HOME}/.vnc ] && die ".vnc directory found in ${HOME}"
 	[ $(id -u) -eq 0 ] && die "cannot be executed as root"
 	grep "ID=ubuntu" /etc/os-release || die "not ubuntu linux"
 }
